@@ -1,6 +1,6 @@
 # copy-as-markdown
 
-A React hook to allow copying text as Markdown.
+A React hook to copy text as Markdown.
 
 ## Why?
 
