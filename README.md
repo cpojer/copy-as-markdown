@@ -10,7 +10,7 @@ Copying text as Markdown is helpful for blog posts or documentation pages that w
 
 ## See it in action
 
-Check out blog posts on cpojer.net, for example [Principles of Developer Experience](https://cpojer.net/posts/principles-of-devx), and copy text within the article. The text will be copied as markdown.
+Check out blog posts on cpojer.net, for example [Principles of Developer Experience](https://cpojer.net/posts/principles-of-devx), and copy text within the article. The text will be copied as Markdown.
 
 ## Usage
 
