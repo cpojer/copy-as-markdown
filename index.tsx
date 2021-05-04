@@ -52,6 +52,7 @@ export default function useCopyAsMarkdown(
         const markdown =
           html &&
           new TurndownService({
+            codeBlockStyle: 'fenced',
             headingStyle: 'atx',
             hr: '---',
             ...markdownOptions,

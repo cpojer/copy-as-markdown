@@ -100,3 +100,32 @@ test('copies the code without escaping characters', () => {
   // we let the browser handle the copy event.
   expect(setData).not.toHaveBeenCalled();
 });
+
+test('uses backticks for multiline code examples', () => {
+  element.innerHTML =
+    '<h1>Banana Banana Banana?</h1><pre><code class="language-javascript">' +
+    'const variable = `this is a multiline code example`;\n' +
+    'console.log(`banana banana banana`);</code></pre>';
+
+  mockSelection(element, element.children[1]);
+
+  const {result} = renderHook(() => useCopyAsMarkdown());
+
+  act(() => {
+    result.current(element);
+  });
+
+  fireEvent(element, fakeClipboardEvent);
+
+  expect(setData.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "text/plain",
+        "\`\`\`javascript
+    const variable = \`this is a multiline code example\`;
+    console.log(\`banana banana banana\`);
+    \`\`\`",
+      ],
+    ]
+  `);
+});
