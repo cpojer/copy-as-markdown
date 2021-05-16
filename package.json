@@ -1,6 +1,6 @@
 {
   "name": "@cnakazawa/copy-as-markdown",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "license": "MIT",
   "main": "index.js",
   "types": "index.d.ts",

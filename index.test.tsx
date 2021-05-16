@@ -1,6 +1,6 @@
 import {fireEvent} from '@testing-library/react';
 import {renderHook, act} from '@testing-library/react-hooks';
-import useCopyAsMarkdown from './index.js';
+import useCopyAsMarkdown, {getSelectedInnerHTML} from './index.js';
 
 type SetDataType = (type: string, data: string) => void;
 
@@ -128,4 +128,10 @@ test('uses backticks for multiline code examples', () => {
       ],
     ]
   `);
+});
+
+test('retrieves selected HTML', () => {
+  expect(getSelectedInnerHTML(element)).toMatchInlineSnapshot(
+    `"<h1>Banana Banana Banana?</h1>"`,
+  );
 });

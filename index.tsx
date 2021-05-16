@@ -8,7 +8,7 @@ type RefType = {
 
 type CallbackFn = (element: HTMLElement) => void;
 
-const getSelectedInnerHTML = (containerNode: HTMLElement) => {
+export function getSelectedInnerHTML(containerNode: HTMLElement) {
   const selection = window.getSelection();
   if (selection && selection.rangeCount) {
     const container = document.createElement('div');
