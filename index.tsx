@@ -1,14 +1,17 @@
 import {useCallback, useRef} from 'react';
 import type TurndownService from 'turndown';
 
-type RefType = {
+type CopyRefType = {
   element: HTMLElement;
   listener: (event: ClipboardEvent) => void;
 };
 
 type CallbackFn = (element: HTMLElement) => void;
 
-export function getSelectedInnerHTML(containerNode: HTMLElement) {
+function getSelectedInnerHTML(
+  containerNode: HTMLElement,
+  processNode: (element: HTMLElement) => HTMLElement = (element) => element,
+) {
   const selection = window.getSelection();
   if (selection && selection.rangeCount) {
     const container = document.createElement('div');
@@ -28,16 +31,19 @@ export function getSelectedInnerHTML(containerNode: HTMLElement) {
       }
       container.appendChild(selection.getRangeAt(i).cloneContents());
     }
-    return container.innerHTML;
+    return processNode(container).innerHTML;
   }
 
   return null;
-};
+}
 
 export default function useCopyAsMarkdown(
-  markdownOptions?: TurndownService.Options,
+  markdownOptions?: TurndownService.Options | null,
+  options?: {
+    processNode?: (element: HTMLElement) => HTMLElement;
+  },
 ): CallbackFn {
-  const ref = useRef<RefType | null>(null);
+  const ref = useRef<CopyRefType | null>(null);
   return useCallback((element: HTMLElement) => {
     if (ref.current) {
       ref.current.element.removeEventListener('copy', ref.current.listener);
@@ -48,7 +54,7 @@ export default function useCopyAsMarkdown(
         // Lazy-require `turndown` only when needed.
         const TurndownService =
           require('turndown').default || require('turndown');
-        const html = getSelectedInnerHTML(element);
+        const html = getSelectedInnerHTML(element, options?.processNode);
         const markdown =
           html &&
           new TurndownService({

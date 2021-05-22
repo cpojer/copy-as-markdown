@@ -1,6 +1,6 @@
 import {fireEvent} from '@testing-library/react';
 import {renderHook, act} from '@testing-library/react-hooks';
-import useCopyAsMarkdown, {getSelectedInnerHTML} from './index.js';
+import useCopyAsMarkdown from './index.js';
 
 type SetDataType = (type: string, data: string) => void;
 
@@ -130,8 +130,33 @@ test('uses backticks for multiline code examples', () => {
   `);
 });
 
-test('retrieves selected HTML', () => {
-  expect(getSelectedInnerHTML(element)).toMatchInlineSnapshot(
-    `"<h1>Banana Banana Banana?</h1>"`,
+test('processes the HTML node before copying', () => {
+  const {result} = renderHook(() =>
+    useCopyAsMarkdown(null, {
+      processNode: (element) => {
+        const a = document.createElement('a');
+        a.href = 'https://cpojer.net';
+        a.innerHTML = 'cpojer.net';
+        element.appendChild(a);
+        return element;
+      },
+    }),
   );
+
+  act(() => {
+    result.current(element);
+  });
+
+  fireEvent(element, fakeClipboardEvent);
+
+  expect(setData.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "text/plain",
+        "# Banana Banana Banana?
+
+    [cpojer.net](https://cpojer.net)",
+      ],
+    ]
+  `);
 });
