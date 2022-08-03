@@ -1,0 +1,7 @@
+.prettierrc
+example.gif
+index.test.js.snap
+index.test.tsx
+jest.config.js
+pnpm-lock.yaml
+tsconfig.json

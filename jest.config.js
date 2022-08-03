@@ -1,5 +1,6 @@
 module.exports = {
-  preset: 'ts-jest',
-  testMatch: ['**/?(*.)+(test).tsx'],
   moduleNameMapper: {'(index).js': '<rootDir>/$1.tsx'},
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  testMatch: ['**/?(*.)+(test).tsx'],
 };
