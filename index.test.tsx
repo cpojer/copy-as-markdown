@@ -11,13 +11,13 @@ let setData: jest.Mock<void, [string, string]>;
 const mockSelection = (ancestor?: Element, selectedElement?: Element) =>
   (window.getSelection = jest.fn(
     () =>
-      (({
+      ({
         rangeCount: 1,
         getRangeAt: () => ({
           commonAncestorContainer: ancestor || element,
           cloneContents: () => selectedElement || element.children[0],
         }),
-      } as unknown) as Selection),
+      } as unknown as Selection),
   ));
 
 beforeEach(() => {
@@ -38,7 +38,7 @@ beforeEach(() => {
     clipboardData: {setData: SetDataType};
   };
 
-  ((fakeClipboardEvent as unknown) as FakeClipboardData).clipboardData = {
+  (fakeClipboardEvent as unknown as FakeClipboardData).clipboardData = {
     setData,
   };
 });
@@ -53,8 +53,8 @@ test('copies the header', () => {
   fireEvent(element, fakeClipboardEvent);
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "text/plain",
         "# Banana Banana Banana?",
       ],
@@ -74,8 +74,8 @@ test('copies everything', () => {
   fireEvent(element, fakeClipboardEvent);
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "text/plain",
         "# Banana Banana Banana?
 
@@ -118,8 +118,8 @@ test('uses backticks for multiline code examples', () => {
   fireEvent(element, fakeClipboardEvent);
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "text/plain",
         "\`\`\`javascript
     const variable = \`this is a multiline code example\`;
@@ -150,8 +150,8 @@ test('processes the HTML node before copying', () => {
   fireEvent(element, fakeClipboardEvent);
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
-    Array [
-      Array [
+    [
+      [
         "text/plain",
         "# Banana Banana Banana?
 
