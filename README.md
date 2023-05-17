@@ -17,13 +17,13 @@ Check out blog posts on cpojer.net, for example [Principles of Developer Experie
 Install:
 
 ```
-yarn add @cnakazawa/copy-as-markdown
+yarn add @nkzw/copy-as-markdown
 ```
 
 Use:
 
 ```jsx
-import useCopyAsMarkdown from '@cnakazawa/copy-as-markdown';
+import useCopyAsMarkdown from '@nkzw/copy-as-markdown';
 
 export default function MyComponent() {
   const setRef = useCopyAsMarkdown();
