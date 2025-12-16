@@ -8,7 +8,7 @@ Copying text as Markdown is helpful for blog posts or documentation pages that w
 
 ![Example](https://raw.githubusercontent.com/cpojer/copy-as-markdown/main/example.gif)
 
-## See it in action
+## See it in Action
 
 Check out blog posts on cpojer.net, for example [Principles of Developer Experience](https://cpojer.net/posts/principles-of-devx), and copy text within the article. The text will be copied as Markdown.
 
@@ -31,9 +31,8 @@ export default function MyComponent() {
   return (
     <div ref={setRef}>
       <h1>When copied, this will turn into Markdown</h1>
-      Any <em>rich content</em> inside of this container will be copied as <strong>
-        Markdown
-      </strong>.
+      Any <em>rich content</em> inside of this container will be copied as{' '}
+      <strong>Markdown</strong>.
     </div>
   );
 }

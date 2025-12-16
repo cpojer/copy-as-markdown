@@ -1,4 +1,4 @@
-import {useCallback, useRef} from 'react';
+import { useCallback, useRef } from 'react';
 import type TurndownService from 'turndown';
 
 type CopyRefType = {
@@ -29,7 +29,7 @@ function getSelectedInnerHTML(
         }
         parent = parent.parentElement;
       }
-      container.appendChild(selection.getRangeAt(i).cloneContents());
+      container.append(selection.getRangeAt(i).cloneContents());
     }
     return processNode(container).innerHTML;
   }
@@ -44,35 +44,36 @@ export default function useCopyAsMarkdown(
   },
 ): CallbackFn {
   const ref = useRef<CopyRefType | null>(null);
-  return useCallback((element: HTMLElement) => {
-    if (ref.current) {
-      ref.current.element.removeEventListener('copy', ref.current.listener);
-      ref.current = null;
-    }
-    if (element) {
-      const listener = (event: ClipboardEvent) => {
-        // Lazy-require `turndown` only when needed.
-        const TurndownService =
-          require('turndown').default || require('turndown');
-        const html = getSelectedInnerHTML(element, options?.processNode);
-        const markdown =
-          html &&
-          new TurndownService({
-            codeBlockStyle: 'fenced',
-            headingStyle: 'atx',
-            hr: '---',
-            ...markdownOptions,
-          }).turndown(html);
-        if (markdown) {
-          event.preventDefault();
-          event.clipboardData?.setData('text/plain', markdown);
-        }
-      };
-      element.addEventListener('copy', listener);
-      ref.current = {
-        element,
-        listener,
-      };
-    }
-  }, []);
+  return useCallback(
+    (element: HTMLElement) => {
+      if (ref.current) {
+        ref.current.element.removeEventListener('copy', ref.current.listener);
+        ref.current = null;
+      }
+      if (element) {
+        const listener = async (event: ClipboardEvent) => {
+          const { default: TurndownService } = await import('turndown');
+          const html = getSelectedInnerHTML(element, options?.processNode);
+          const markdown =
+            html &&
+            new TurndownService({
+              codeBlockStyle: 'fenced',
+              headingStyle: 'atx',
+              hr: '---',
+              ...markdownOptions,
+            }).turndown(html);
+          if (markdown) {
+            event.preventDefault();
+            event.clipboardData?.setData('text/plain', markdown);
+          }
+        };
+        element.addEventListener('copy', listener);
+        ref.current = {
+          element,
+          listener,
+        };
+      }
+    },
+    [markdownOptions, options?.processNode],
+  );
 }

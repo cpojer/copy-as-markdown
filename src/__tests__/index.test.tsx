@@ -1,23 +1,30 @@
-import {fireEvent} from '@testing-library/react';
-import {renderHook, act} from '@testing-library/react-hooks';
-import useCopyAsMarkdown from './index.js';
+/**
+ * @vitest-environment happy-dom
+ */
+
+import { act, fireEvent, renderHook } from '@testing-library/react';
+import { beforeEach, expect, Mock, test, vi } from 'vitest';
+import useCopyAsMarkdown from '../index.tsx';
+
+// @ts-expect-error
+global.IS_REACT_ACT_ENVIRONMENT = true;
 
 type SetDataType = (type: string, data: string) => void;
 
 let element: HTMLDivElement;
-let fakeClipboardEvent: ClipboardEvent;
-let setData: jest.Mock<void, [string, string]>;
+let clipboardEvent: ClipboardEvent;
+let setData: Mock<SetDataType>;
 
 const mockSelection = (ancestor?: Element, selectedElement?: Element) =>
-  (window.getSelection = jest.fn(
+  (window.getSelection = vi.fn(
     () =>
       ({
-        rangeCount: 1,
         getRangeAt: () => ({
-          commonAncestorContainer: ancestor || element,
           cloneContents: () => selectedElement || element.children[0],
+          commonAncestorContainer: ancestor || element,
         }),
-      } as unknown as Selection),
+        rangeCount: 1,
+      }) as unknown as Selection,
   ));
 
 beforeEach(() => {
@@ -27,30 +34,30 @@ beforeEach(() => {
 
   mockSelection();
 
-  fakeClipboardEvent = new Event('copy', {
+  clipboardEvent = new Event('copy', {
     bubbles: true,
     cancelable: true,
   }) as ClipboardEvent;
-  fakeClipboardEvent.preventDefault = jest.fn();
-  setData = jest.fn();
+  clipboardEvent.preventDefault = vi.fn();
+  setData = vi.fn();
 
   type FakeClipboardData = {
-    clipboardData: {setData: SetDataType};
+    clipboardData: { setData: SetDataType };
   };
 
-  (fakeClipboardEvent as unknown as FakeClipboardData).clipboardData = {
+  (clipboardEvent as unknown as FakeClipboardData).clipboardData = {
     setData,
   };
 });
 
-test('copies the header', () => {
-  const {result} = renderHook(() => useCopyAsMarkdown());
+test('copies the header', async () => {
+  const { result } = renderHook(() => useCopyAsMarkdown());
 
-  act(() => {
-    result.current(element);
-  });
+  act(() => result.current(element));
 
-  fireEvent(element, fakeClipboardEvent);
+  fireEvent(element, clipboardEvent);
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
     [
@@ -62,16 +69,16 @@ test('copies the header', () => {
   `);
 });
 
-test('copies everything', () => {
+test('copies everything', async () => {
   mockSelection(element, element);
 
-  const {result} = renderHook(() => useCopyAsMarkdown());
+  const { result } = renderHook(() => useCopyAsMarkdown());
 
-  act(() => {
-    result.current(element);
-  });
+  act(() => result.current(element));
 
-  fireEvent(element, fakeClipboardEvent);
+  fireEvent(element, clipboardEvent);
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
     [
@@ -85,23 +92,23 @@ test('copies everything', () => {
   `);
 });
 
-test('copies the code without escaping characters', () => {
+test('copies the code without escaping characters', async () => {
   mockSelection(element.children[2], element.children[2]);
 
-  const {result} = renderHook(() => useCopyAsMarkdown());
+  const { result } = renderHook(() => useCopyAsMarkdown());
 
-  act(() => {
-    result.current(element);
-  });
+  act(() => result.current(element));
 
-  fireEvent(element, fakeClipboardEvent);
+  fireEvent(element, clipboardEvent);
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   // Expect no clipboard interception to have happened. This means
   // we let the browser handle the copy event.
   expect(setData).not.toHaveBeenCalled();
 });
 
-test('uses backticks for multiline code examples', () => {
+test('uses backticks for multiline code examples', async () => {
   element.innerHTML =
     '<h1>Banana Banana Banana?</h1><pre><code class="language-javascript">' +
     'const variable = `this is a multiline code example`;\n' +
@@ -109,13 +116,13 @@ test('uses backticks for multiline code examples', () => {
 
   mockSelection(element, element.children[1]);
 
-  const {result} = renderHook(() => useCopyAsMarkdown());
+  const { result } = renderHook(() => useCopyAsMarkdown());
 
-  act(() => {
-    result.current(element);
-  });
+  act(() => result.current(element));
 
-  fireEvent(element, fakeClipboardEvent);
+  fireEvent(element, clipboardEvent);
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
     [
@@ -130,24 +137,24 @@ test('uses backticks for multiline code examples', () => {
   `);
 });
 
-test('processes the HTML node before copying', () => {
-  const {result} = renderHook(() =>
+test('processes the HTML node before copying', async () => {
+  const { result } = renderHook(() =>
     useCopyAsMarkdown(null, {
       processNode: (element) => {
         const a = document.createElement('a');
         a.href = 'https://cpojer.net';
         a.innerHTML = 'cpojer.net';
-        element.appendChild(a);
+        element.append(a);
         return element;
       },
     }),
   );
 
-  act(() => {
-    result.current(element);
-  });
+  act(() => result.current(element));
 
-  fireEvent(element, fakeClipboardEvent);
+  fireEvent(element, clipboardEvent);
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   expect(setData.mock.calls).toMatchInlineSnapshot(`
     [
