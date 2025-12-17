@@ -45,7 +45,7 @@ export default function useCopyAsMarkdown(
 ): CallbackFn {
   const ref = useRef<CopyRefType | null>(null);
   return useCallback(
-    (element: HTMLElement) => {
+    (element: HTMLElement | null) => {
       if (ref.current) {
         ref.current.element.removeEventListener('copy', ref.current.listener);
         ref.current = null;

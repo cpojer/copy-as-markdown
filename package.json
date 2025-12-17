@@ -1,6 +1,6 @@
 {
   "name": "@nkzw/copy-as-markdown",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A React hook to copy text as Markdown.",
   "homepage": "https://github.com/nkzw-tech/library-template",
   "repository": {
