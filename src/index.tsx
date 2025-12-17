@@ -1,13 +1,6 @@
 import { useCallback, useRef } from 'react';
 import type TurndownService from 'turndown';
 
-type CopyRefType = {
-  element: HTMLElement;
-  listener: (event: ClipboardEvent) => void;
-};
-
-type CallbackFn = (element: HTMLElement) => void;
-
 function getSelectedInnerHTML(
   containerNode: HTMLElement,
   processNode: (element: HTMLElement) => HTMLElement = (element) => element,
@@ -27,6 +20,7 @@ function getSelectedInnerHTML(
         ) {
           return null;
         }
+
         parent = parent.parentElement;
       }
       container.append(selection.getRangeAt(i).cloneContents());
@@ -37,19 +31,24 @@ function getSelectedInnerHTML(
   return null;
 }
 
-export default function useCopyAsMarkdown(
+export default function useCopyAsMarkdown<T extends HTMLElement>(
   markdownOptions?: TurndownService.Options | null,
   options?: {
     processNode?: (element: HTMLElement) => HTMLElement;
   },
-): CallbackFn {
-  const ref = useRef<CopyRefType | null>(null);
+) {
+  const ref = useRef<{
+    element: T;
+    listener: (event: ClipboardEvent) => void;
+  } | null>(null);
+
   return useCallback(
-    (element: HTMLElement | null) => {
+    (element: T | null) => {
       if (ref.current) {
         ref.current.element.removeEventListener('copy', ref.current.listener);
         ref.current = null;
       }
+
       if (element) {
         const listener = async (event: ClipboardEvent) => {
           const { default: TurndownService } = await import('turndown');
@@ -62,6 +61,7 @@ export default function useCopyAsMarkdown(
               hr: '---',
               ...markdownOptions,
             }).turndown(html);
+
           if (markdown) {
             event.preventDefault();
             event.clipboardData?.setData('text/plain', markdown);

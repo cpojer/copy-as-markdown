@@ -167,3 +167,13 @@ test('processes the HTML node before copying', async () => {
     ]
   `);
 });
+
+test('types work correctly', () => {
+  const Component = () => {
+    const setRef = useCopyAsMarkdown();
+
+    return <div ref={setRef}>Hello World</div>;
+  };
+
+  expect(() => renderHook(() => <Component />)).not.toThrow();
+});
